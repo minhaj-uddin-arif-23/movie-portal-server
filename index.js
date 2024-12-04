@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 const cors = require("cors");
 const app = express();
@@ -32,14 +32,6 @@ async function run() {
   try {
     // database create
     const movieCollection = client.db("movieDB").collection("movies");
-    
-      // data get to dataBase 
-      app.get('/addmovie',async (req,res)=>{
-        const cursor = movieCollection.find()
-        const result = await cursor.toArray()
-        res.send(result)
-      })
-
 
     //data create complete
 
@@ -47,6 +39,21 @@ async function run() {
       const add_Movie = req.body;
       const result = await movieCollection.insertOne(add_Movie);
       console.log(result);
+      res.send(result);
+    });
+
+    // data get to dataBase
+    app.get("/addmovie", async (req, res) => {
+      const cursor = movieCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // delete a movie
+    app.delete("/addmovie/:id", async (req, res) => {
+      const singleMovie = req.params.id;
+      const query = { _id: new ObjectId(singleMovie) };
+      const result = await movieCollection.deleteOne(query);
       res.send(result);
     });
 
