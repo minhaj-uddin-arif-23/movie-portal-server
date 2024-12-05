@@ -11,8 +11,9 @@ app.use(cors());
 app.use(express.json());
 // middle end
 // mongodb database connect and also operation here
+// always environment variable variable can be small letter
 
-const uri = `mongodb+srv://MoviePortal:lfT332UREnHY9VDB@cluster0.wclmi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const uri = `mongodb+srv://${process.env.db_user}:${process.env.UserPassword}@cluster0.wclmi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 console.log(uri);
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -46,6 +47,35 @@ async function run() {
     app.get("/addmovie", async (req, res) => {
       const cursor = movieCollection.find();
       const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // single data get by id
+    app.get("/addmovie/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await movieCollection.findOne(query);
+      res.send(result);
+    });
+
+    // update the movie
+    app.put("/addmovie/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedMovie = req.body;
+      const movie = {
+        $set: {
+          image: updatedMovie.image,
+          title: updatedMovie.title,
+          genre: updatedMovie.genre,
+          duration: updatedMovie.duration,
+          releaseYear: updatedMovie.releaseYear,
+          rating: updatedMovie.rating,
+          summary: updatedMovie.summary,
+        },
+      };
+      const result = await movieCollection.updateOne(query, options, movie);
       res.send(result);
     });
 
