@@ -33,6 +33,15 @@ async function run() {
   try {
     // database create
     const movieCollection = client.db("movieDB").collection("movies");
+    // const favouriteMovieCollection = client.db("favouriteDB").collection("favouriteMovie")
+    // add to favourite list in order to dataBase
+    app.post('/favourite',async (req,res) => {
+      const favourite_movie = req.body;
+      const ans = await favouriteMovieCollection.insertOne(favourite_movie)
+      console.log(ans)
+      res.send(ans)
+    })
+
 
     //data create complete
 
@@ -45,7 +54,12 @@ async function run() {
 
     // data get to dataBase
     app.get("/addmovie", async (req, res) => {
-      const cursor = movieCollection.find();
+      const {serchParams} = req.query;
+      let option = {};
+      if(serchParams){
+        option = {title:{$regex:serchParams,$options:"i"}};
+      }
+      const cursor = movieCollection.find(option);
       const result = await cursor.toArray();
       res.send(result);
     });
@@ -59,10 +73,10 @@ async function run() {
     });
 
     // update the movie
-    app.put("/addmovie/:id", async (req, res) => {
+    app.patch("/addmovie/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
-      const options = { upsert: true };
+      // const options = { upsert: true };
       const updatedMovie = req.body;
       const movie = {
         $set: {
@@ -75,7 +89,7 @@ async function run() {
           summary: updatedMovie.summary,
         },
       };
-      const result = await movieCollection.updateOne(query, options, movie);
+      const result = await movieCollection.updateOne(query, movie);
       res.send(result);
     });
 
