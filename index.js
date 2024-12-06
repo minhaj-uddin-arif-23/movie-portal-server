@@ -33,15 +33,25 @@ async function run() {
   try {
     // database create
     const movieCollection = client.db("movieDB").collection("movies");
-    // const favouriteMovieCollection = client.db("favouriteDB").collection("favouriteMovie")
+    const favouriteMovieCollection = client.db("favouriteDB").collection("favouriteMovie")
     // add to favourite list in order to dataBase
+      
     app.post('/favourite',async (req,res) => {
       const favourite_movie = req.body;
       const ans = await favouriteMovieCollection.insertOne(favourite_movie)
       console.log(ans)
       res.send(ans)
     })
+    app.get('/favourite/:id',async(req,res)=>{
+      const id = req.params.id;
+      const query = {_id:new ObjectId(id)};
+      const result = await favouriteMovieCollection.findOne(query)
+      res.send(result)
+    })
 
+// add to favourite list in order to dataBase
+
+//-------------------------------
 
     //data create complete
 
@@ -59,7 +69,7 @@ async function run() {
       if(serchParams){
         option = {title:{$regex:serchParams,$options:"i"}};
       }
-      const cursor = movieCollection.find(option);
+      const cursor = movieCollection.find(option).limit(6);
       const result = await cursor.toArray();
       res.send(result);
     });
