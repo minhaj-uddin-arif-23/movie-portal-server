@@ -90,10 +90,17 @@ async function run() {
         option = { title: { $regex: serchParams, $options: "i" } };
       }
       // .limit(6)
-      const cursor = movieCollection.find(option).limit(6);
+      const cursor = movieCollection.find(option);
       const result = await cursor.toArray();
       res.send(result);
     });
+
+
+    app.get('/feturemovie',async(req,res)=>{
+      const feturedMovie = movieCollection.find().limit(6)
+      const result = await feturedMovie.toArray()
+      res.send(result)
+    })
 
     // single data get by id
     app.get("/addmovie/:id", async (req, res) => {
