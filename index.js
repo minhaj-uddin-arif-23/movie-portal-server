@@ -38,6 +38,10 @@ async function run() {
       .collection("favouriteMovie");
     // add to favourite list in order to dataBase
 
+    app.get("/", async (req, res) => {
+      res.send("hello");
+    });
+
     app.post("/favourite", async (req, res) => {
       const favourite_movie = req.body;
       const ans = await favouriteMovieCollection.insertOne(favourite_movie);
@@ -58,12 +62,11 @@ async function run() {
     app.get("/api/favourite/:email", async (req, res) => {
       const email = req.params.email;
       // const result = await cursor.toArray();
-      const cursor = await favouriteMovieCollection.find({email}).toArray();
+      const cursor = await favouriteMovieCollection.find({ email }).toArray();
       // console.log(cursor)
       // console.log(re)
       res.send(cursor);
     });
-
 
     app.delete("/favourite/:id", async (req, res) => {
       const id = req.params.id;
@@ -96,11 +99,11 @@ async function run() {
     });
 
     // fetured movie home
-    app.get('/feturemovie',async(req,res)=>{
-      const feturedMovie = movieCollection.find().sort({"rating":-1}).limit(6)
-      const result = await feturedMovie.toArray()
-      res.send(result)
-    })
+    app.get("/feturemovie", async (req, res) => {
+      const feturedMovie = movieCollection.find().sort({ rating: -1 }).limit(6);
+      const result = await feturedMovie.toArray();
+      res.send(result);
+    });
 
     // single data get by id
     app.get("/addmovie/:id", async (req, res) => {
@@ -138,12 +141,13 @@ async function run() {
       res.send(result);
     });
 
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // );
   } finally {
   }
 }
+
 run().catch(console.dir);
 
 // Ensures that the client will close when you finish/error
