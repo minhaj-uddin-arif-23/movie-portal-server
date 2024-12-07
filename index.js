@@ -33,26 +33,46 @@ async function run() {
   try {
     // database create
     const movieCollection = client.db("movieDB").collection("movies");
-    const favouriteMovieCollection = client.db("favouriteDB").collection("favouriteMovie")
+    const favouriteMovieCollection = client
+      .db("favouriteDB")
+      .collection("favouriteMovie");
     // add to favourite list in order to dataBase
-      
-    app.post('/favourite',async (req,res) => {
+
+    app.post("/favourite", async (req, res) => {
       const favourite_movie = req.body;
-      const ans = await favouriteMovieCollection.insertOne(favourite_movie)
-      console.log(ans)
-      res.send(ans)
-    })
-    app.get('/favourite/:id',async(req,res)=>{
+      const ans = await favouriteMovieCollection.insertOne(favourite_movie);
+      console.log(ans);
+      res.send(ans);
+    });
+    app.get("/favourite", async (req, res) => {
+      const cursor = favouriteMovieCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+    app.get("/favourite/:id", async (req, res) => {
       const id = req.params.id;
-      const query = {_id:new ObjectId(id)};
-      const result = await favouriteMovieCollection.findOne(query)
-      res.send(result)
-    })
+      const query = { _id: id };
+      const result = await favouriteMovieCollection.findOne(query);
+      res.send(result);
+    });
+    app.get("/api/favourite/:email", async (req, res) => {
+      const email = req.params.email;
+      // const result = await cursor.toArray();
+      const cursor = await favouriteMovieCollection.find({email}).toArray();
+      // console.log(cursor)
+      // console.log(re)
+      res.send(cursor);
+    });
 
-// add to favourite list in order to dataBase
 
-//-------------------------------
-
+    app.delete("/favourite/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await favouriteMovieCollection.deleteOne(query);
+      res.send(result);
+    });
+    // add to favourite list in order to dataBase
+    //-------------------------------
     //data create complete
 
     app.post("/addmovie", async (req, res) => {
@@ -64,11 +84,12 @@ async function run() {
 
     // data get to dataBase
     app.get("/addmovie", async (req, res) => {
-      const {serchParams} = req.query;
+      const { serchParams } = req.query;
       let option = {};
-      if(serchParams){
-        option = {title:{$regex:serchParams,$options:"i"}};
+      if (serchParams) {
+        option = { title: { $regex: serchParams, $options: "i" } };
       }
+      // .limit(6)
       const cursor = movieCollection.find(option).limit(6);
       const result = await cursor.toArray();
       res.send(result);
@@ -102,7 +123,6 @@ async function run() {
       const result = await movieCollection.updateOne(query, movie);
       res.send(result);
     });
-
     // delete a movie
     app.delete("/addmovie/:id", async (req, res) => {
       const singleMovie = req.params.id;
