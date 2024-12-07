@@ -95,9 +95,9 @@ async function run() {
       res.send(result);
     });
 
-
+    // fetured movie home
     app.get('/feturemovie',async(req,res)=>{
-      const feturedMovie = movieCollection.find().limit(6)
+      const feturedMovie = movieCollection.find().sort({"rating":-1}).limit(6)
       const result = await feturedMovie.toArray()
       res.send(result)
     })
